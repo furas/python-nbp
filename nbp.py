@@ -7,6 +7,8 @@ http://api.nbp.pl/
 import urllib.request
 import json
 
+# -----------------------------------
+
 def get_tables(table='a', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
     _url = 'http://api.nbp.pl/api/exchangerates/tables/{table}/{args}?format={format}'
 
@@ -34,7 +36,8 @@ def get_tables(table='a', format_='json', today=False, date=None, last=None, fro
     return response.read().decode('utf-8')
 
 # -----------------------------------
-def get_rates(table='a', code='PLN', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
+
+def get_rates(table='a', code='EUR', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
     _url = 'http://api.nbp.pl/api/exchangerates/rates/{table}/{code}/{args}?format={format}'
 
     if today:
@@ -68,7 +71,7 @@ def display_table(data):
     print('effectiveDate:', data['effectiveDate'])
 
     for x in data['rates']:
-        print('{} | {:-10s} | {}'.format(x['code'], x['mid'], x['currency']))
+        print('{} | {:10s} | {}'.format(x['code'], str(x['mid']), x['currency']))
 
 def display_table_c(data):
     print('table:', data['table'])
@@ -76,19 +79,19 @@ def display_table_c(data):
     print('effectiveDate:', data['effectiveDate'])
 
     for x in data['rates']:
-        print('{} | {:-10s} | {:-10s} | {}'.format(x['code'], x['mid'], x['currency']))
+        print('{} | {:10s} | {:10s} | {}'.format(x['code'], str(x['ask']), str(x['bid']), x['currency']))
 
 # -----------------------------------
 
-def display_rate(data):
+def display_rates(data):
     print('table:', data['table'])
     print('currency:', data['currency'])
     print('code:', data['code'])
 
     for x in data['rates']:
-        print('| {} | {} | {:-10s} |'.format(x['no'], x['effectiveDate'], x['mid']))
+        print('| {} | {} | {:10s} |'.format(x['no'], x['effectiveDate'], str(x['mid'])))
 
-def display_rate_c(data):
+def display_rates_c(data):
     print('table:', data['table'])
     print('currency:', data['currency'])
     print('code:', data['code'])
@@ -108,16 +111,16 @@ if __name__ == '__main__':
     )
 
     parser.add_argument('-t', metavar='TABLE', type=str, help='table name: A, B or C (default: A)', default='A', dest='table')
-    parser.add_argument('-c', metavar='CODE', type=str, help='code (default: PLN)', dest='code')
-    parser.add_argument('-d', metavar='DATE', type=str, help='get table for date DATE', dest='date')
-    parser.add_argument('-l', metavar='NUMBER', type=int, help='get last NUMBER tables', dest='last')
-    parser.add_argument('--today', action='store_true', help='get table for exactly today')
-    parser.add_argument('--from', type=str, help='get tables for dates from FROM to TO', dest='from_date')
-    parser.add_argument('--to', type=str, help='get tables for dates from FROM to TO', dest='to_date')
-    parser.add_argument('--debug', action='store_true', help='show arguments')
+    parser.add_argument('-c', metavar='CODE', type=str, help='code of currency', dest='code')
+    parser.add_argument('-d', metavar='DATE', type=str, help='table for date DATE', dest='date')
+    parser.add_argument('-l', metavar='NUMBER', type=int, help='last NUMBER tables', dest='last')
+    parser.add_argument('--today', action='store_true', help='table for exactly today')
+    parser.add_argument('--from', type=str, help='tables from FROM_DATE to TO_DATE', dest='from_date')
+    parser.add_argument('--to', type=str, help='tables from FROM_DATE to TO_DATE', dest='to_date')
     parser.add_argument('--json', action='store_true', help='return json')
     parser.add_argument('--xml', action='store_true', help='return xml')
     parser.add_argument('--url', action='store_true', help='show url')
+    parser.add_argument('--debug', action='store_true', help='show arguments')
 
     args = parser.parse_args()
 
@@ -166,9 +169,9 @@ if __name__ == '__main__':
         else:
             data = json.loads(text)
             if args.table == 'C':
-                display_rate_c(data)
+                display_rates_c(data)
             else:
-                display_rate(data)
+                display_rates(data)
 
     else:
         #if args.d or args.today or args.l:
