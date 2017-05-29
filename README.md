@@ -52,3 +52,7 @@ if text:
   data = json.loads(text)
   print(data[0])
 ```
+
+---
+
+Similar project: https://github.com/jqb/python-nbp

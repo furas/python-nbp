@@ -5,7 +5,6 @@ http://api.nbp.pl/
 '''
 
 import urllib.request
-import json
 
 # -----------------------------------
 
@@ -66,43 +65,40 @@ def get_rates(table='a', code='EUR', format_='json', today=False, date=None, las
 # -----------------------------------
 
 def display_table(data):
-    print('table:', data['table'])
-    print('no:', data['no'])
-    print('effectiveDate:', data['effectiveDate'])
 
-    for x in data['rates']:
-        print('{} | {:10s} | {}'.format(x['code'], str(x['mid']), x['currency']))
+    for part in data:
 
-def display_table_c(data):
-    print('table:', data['table'])
-    print('no:', data['no'])
-    print('effectiveDate:', data['effectiveDate'])
+        print('table:', part['table'])
+        print('no:', part['no'])
+        print('effectiveDate:', part['effectiveDate'])
 
-    for x in data['rates']:
-        print('{} | {:10s} | {:10s} | {}'.format(x['code'], str(x['ask']), str(x['bid']), x['currency']))
+        if part['table'] == 'C':
+            for x in part['rates']:
+                print('{} | {:10s} | {:10s} | {}'.format(x['code'], str(x['ask']), str(x['bid']), x['currency']))
+        else:
+            for x in part['rates']:
+                print('{} | {:10s} | {}'.format(x['code'], str(x['mid']), x['currency']))
 
 # -----------------------------------
 
 def display_rates(data):
+
     print('table:', data['table'])
     print('currency:', data['currency'])
     print('code:', data['code'])
 
-    for x in data['rates']:
-        print('| {} | {} | {:10s} |'.format(x['no'], x['effectiveDate'], str(x['mid'])))
-
-def display_rates_c(data):
-    print('table:', data['table'])
-    print('currency:', data['currency'])
-    print('code:', data['code'])
-
-    for x in data['rates']:
-        print('| {} | {} | {:10s} | {:10s} |'.format(x['no'], x['effectiveDate'], str(x['ask']), str(x['bid'])))
+    if data['table'] == 'C':
+        for x in data['rates']:
+            print('| {} | {} | {:10s} | {:10s} |'.format(x['no'], x['effectiveDate'], str(x['ask']), str(x['bid'])))
+    else:
+        for x in data['rates']:
+            print('| {} | {} | {:10s} |'.format(x['no'], x['effectiveDate'], str(x['mid'])))
 
 # -----------------------------------
 
 if __name__ == '__main__':
     import argparse
+    import json
 
     parser = argparse.ArgumentParser(
         description='Get data from NBP',
@@ -158,8 +154,8 @@ if __name__ == '__main__':
                 last=args.last,
                 from_date=args.from_date,
                 to_date=args.to_date,
-                show_url=args.url,
                 format_=format_,
+                show_url=args.url,
             )
 
         if not text:
@@ -168,10 +164,7 @@ if __name__ == '__main__':
             print(text)
         else:
             data = json.loads(text)
-            if args.table == 'C':
-                display_rates_c(data)
-            else:
-                display_rates(data)
+            display_rates(data)
 
     else:
         #if args.d or args.today or args.l:
@@ -182,8 +175,8 @@ if __name__ == '__main__':
                 last=args.last,
                 from_date=args.from_date,
                 to_date=args.to_date,
-                show_url=args.url,
                 format_=format_,
+                show_url=args.url,
             )
 
         if not text:
@@ -192,8 +185,4 @@ if __name__ == '__main__':
             print(text)
         else:
             data = json.loads(text)
-            for x in data:
-                if args.table == 'C':
-                    display_table_c(x)
-                else:
-                    display_table(x)
+            display_tables(x)
