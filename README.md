@@ -55,4 +55,30 @@ if text:
 
 ---
 
+When function can't get data then it returns `None` instead of raising exception. 
+You have to check `None` before you 
+
+You can set `npb.DEBUG = True` to see error message raised by request.
+
+Example with invalid date `2017-12-32`
+
+```python
+import nbp
+
+nbp.DEBUG = True
+
+text = nbp.get_tables(date="2017-12-32")
+if text:
+  data = json.loads(text)
+  print(data[0])
+```
+Result:
+```
+
+```
+
+---
+
 Similar project: https://github.com/jqb/python-nbp
+
+

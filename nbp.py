@@ -1,14 +1,38 @@
 #!/usr/bin/env python3
 
 '''
-http://api.nbp.pl/
+Getting data from http://api.nbp.pl/ 
 '''
 
 import urllib.request
 
+DEBUG = False
+'''Display request exception'''
+
 # -----------------------------------
 
 def get_tables(table='a', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
+    '''
+    It gets tables from server and returns as string or None.
+    You have to check if it result is not None and then decode to JSON
+    
+    table='a'
+    format_='json'
+    today=False
+    date=None 
+    last=None
+    from_date=None
+    to_date=None
+    show_url=False
+
+    Example:
+    
+    text = nbp.get_tables()
+    if text:
+        data = json.loads(text)
+        nbp.display_table(data)
+    '''
+
     _url = 'http://api.nbp.pl/api/exchangerates/tables/{table}/{args}?format={format}'
 
     if today:
@@ -29,7 +53,9 @@ def get_tables(table='a', format_='json', today=False, date=None, last=None, fro
 
     try:
         response = urllib.request.urlopen(url)
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError as e:
+        if DEBUG:
+            print('DEBUG: request error:', e)
         return None
 
     return response.read().decode('utf-8')
@@ -37,6 +63,18 @@ def get_tables(table='a', format_='json', today=False, date=None, last=None, fro
 # -----------------------------------
 
 def get_rates(table='a', code='EUR', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
+    '''
+    It gets rates from server and returns as string or None.
+    You have to check if result is not None and then decode to JSON
+    
+    Example:
+    
+    text = nbp.get_rates()
+    if text:
+        data = json.loads(text)
+        nbp.display_rates(data)    
+    '''
+
     _url = 'http://api.nbp.pl/api/exchangerates/rates/{table}/{code}/{args}?format={format}'
 
     if today:
@@ -57,7 +95,9 @@ def get_rates(table='a', code='EUR', format_='json', today=False, date=None, las
 
     try:
         response = urllib.request.urlopen(url)
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError as e:
+        if DEBUG:
+            print('DEBUG: request error:', e.decode('utf-8'))
         return None
 
     return response.read().decode('utf-8')
@@ -65,7 +105,8 @@ def get_rates(table='a', code='EUR', format_='json', today=False, date=None, las
 # -----------------------------------
 
 def display_table(data):
-
+    '''Display table from dictionary `data`'''
+    
     for part in data:
 
         print('table:', part['table'])
@@ -82,6 +123,7 @@ def display_table(data):
 # -----------------------------------
 
 def display_rates(data):
+    '''Display rates from dictionary `data`'''
 
     print('table:', data['table'])
     print('currency:', data['currency'])
@@ -185,4 +227,4 @@ if __name__ == '__main__':
             print(text)
         else:
             data = json.loads(text)
-            display_tables(x)
+            display_table(data)
