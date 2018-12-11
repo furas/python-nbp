@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-Getting data from http://api.nbp.pl/ 
+Getting data from http://api.nbp.pl/
 '''
 
 import urllib.request
@@ -9,24 +9,24 @@ import urllib.request
 DEBUG = False
 '''Display request exception'''
 
-# -----------------------------------
 
-def get_tables(table='a', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
+def get_tables(table='a', format_='json', today=False, date=None, last=None,
+               from_date=None, to_date=None, show_url=False):
     '''
     It gets tables from server and returns as string or None.
     You have to check if it result is not None and then decode to JSON
-    
+
     table='a'
     format_='json'
     today=False
-    date=None 
+    date=None
     last=None
     from_date=None
     to_date=None
     show_url=False
 
     Example:
-    
+
     text = nbp.get_tables()
     if text:
         data = json.loads(text)
@@ -53,26 +53,26 @@ def get_tables(table='a', format_='json', today=False, date=None, last=None, fro
 
     try:
         response = urllib.request.urlopen(url)
-    except urllib.error.HTTPError as e:
+    except urllib.error.HTTPError as ex:
         if DEBUG:
-            print('DEBUG: request error:', e)
+            print('DEBUG: request error:', ex)
         return None
 
     return response.read().decode('utf-8')
 
-# -----------------------------------
 
-def get_rates(table='a', code='EUR', format_='json', today=False, date=None, last=None, from_date=None, to_date=None, show_url=False):
+def get_rates(table='a', code='EUR', format_='json', today=False, date=None,
+              last=None, from_date=None, to_date=None, show_url=False):
     '''
     It gets rates from server and returns as string or None.
     You have to check if result is not None and then decode to JSON
-    
+
     Example:
-    
+
     text = nbp.get_rates()
     if text:
         data = json.loads(text)
-        nbp.display_rates(data)    
+        nbp.display_rates(data)
     '''
 
     _url = 'http://api.nbp.pl/api/exchangerates/rates/{table}/{code}/{args}?format={format}'
@@ -102,11 +102,10 @@ def get_rates(table='a', code='EUR', format_='json', today=False, date=None, las
 
     return response.read().decode('utf-8')
 
-# -----------------------------------
 
 def display_table(data):
     '''Display table from dictionary `data`'''
-    
+
     for part in data:
 
         print('table:', part['table'])
@@ -120,7 +119,6 @@ def display_table(data):
             for x in part['rates']:
                 print('{} | {:10s} | {}'.format(x['code'], str(x['mid']), x['currency']))
 
-# -----------------------------------
 
 def display_rates(data):
     '''Display rates from dictionary `data`'''
@@ -136,7 +134,6 @@ def display_rates(data):
         for x in data['rates']:
             print('| {} | {} | {:10s} |'.format(x['no'], x['effectiveDate'], str(x['mid'])))
 
-# -----------------------------------
 
 if __name__ == '__main__':
     import argparse
@@ -189,42 +186,40 @@ if __name__ == '__main__':
 
     if args.code:
         text = get_rates(
-                table=args.table,
-                code=args.code,
-                today=args.today,
-                date=args.date,
-                last=args.last,
-                from_date=args.from_date,
-                to_date=args.to_date,
-                format_=format_,
-                show_url=args.url,
-            )
+            table=args.table,
+            code=args.code,
+            today=args.today,
+            date=args.date,
+            last=args.last,
+            from_date=args.from_date,
+            to_date=args.to_date,
+            format_=format_,
+            show_url=args.url,
+        )
 
         if not text:
             print('No data')
         elif args.json or args.xml:
             print(text)
         else:
-            data = json.loads(text)
-            display_rates(data)
+            display_table(json.loads(text))
 
     else:
         #if args.d or args.today or args.l:
         text = get_tables(
-                table=args.table,
-                today=args.today,
-                date=args.date,
-                last=args.last,
-                from_date=args.from_date,
-                to_date=args.to_date,
-                format_=format_,
-                show_url=args.url,
-            )
+            table=args.table,
+            today=args.today,
+            date=args.date,
+            last=args.last,
+            from_date=args.from_date,
+            to_date=args.to_date,
+            format_=format_,
+            show_url=args.url,
+        )
 
         if not text:
             print('No data')
         elif args.json or args.xml:
             print(text)
         else:
-            data = json.loads(text)
-            display_table(data)
+            display_table(json.loads(text))
